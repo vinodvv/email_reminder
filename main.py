@@ -3,6 +3,7 @@ import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -16,17 +17,18 @@ with open("reminders.csv") as file:
 
 
 for r in reminders:
-    msg = EmailMessage()
-    msg['Subject'] = "⏰ Your Reminder for Today"
-    msg['From'] = "Vinod V V"
-    msg["To"] = r['email']
-    msg.set_content(f"Message: {r['message']}\n"
-                    f"Date: {r['date']}\n"
-                    f"Time: {r['time']}")
+    if r['date'] == datetime.now().strftime("%Y-%m-%d"):
+        msg = EmailMessage()
+        msg['Subject'] = "⏰ Your Reminder for Today"
+        msg['From'] = "Vinod V V"
+        msg["To"] = r['email']
+        msg.set_content(f"Message: {r['message']}\n"
+                        f"Date: {r['date']}\n"
+                        f"Time: {r['time']}")
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
-        smtp.starttls()
-        smtp.login(email_address, email_password)
-        smtp.send_message(msg)
+        with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
+            smtp.starttls()
+            smtp.login(email_address, email_password)
+            smtp.send_message(msg)
 
-print(f"Emails send successfully!.")
+print(f"Emails send successfully!")
