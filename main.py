@@ -11,10 +11,11 @@ email_address = os.getenv("EMAIL_ADDRESS")
 email_password = os.getenv("EMAIL_PASSWORD")
 
 
-with open("reminders.csv") as file:
+with open("reminders.csv", newline="") as file:
     reader = csv.DictReader(file)
     reminders = list(reader)
 
+remaining = []
 
 for r in reminders:
     if r['date'] == datetime.now().strftime("%Y-%m-%d"):
@@ -30,5 +31,13 @@ for r in reminders:
             smtp.starttls()
             smtp.login(email_address, email_password)
             smtp.send_message(msg)
+    else:
+        remaining.append(r)
+
+with open("reminders.csv", "w", newline="") as file:
+    writer = csv.DictWriter(file,
+                            fieldnames=["date", "time", "email", "message"])
+    writer.writeheader()
+    writer.writerows(remaining)
 
 print(f"Emails send successfully!")
